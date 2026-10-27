@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Site from '../../layouts/Site.astro';
+import Sprite from '../../components/Sprite.astro';
+import ProjectCard from '../../components/site/ProjectCard.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const groups = [
+  {
+    title: 'In production',
+    blurb: 'Platforms and agents that other teams use every day.',
+    items: projects.filter((p) => p.data.kind === 'production'),
+  },
+  {
+    title: 'Research',
+    blurb: 'Peer-reviewed work from UFMG, rewritten for people outside the field.',
+    items: projects.filter((p) => p.data.kind === 'research'),
+  },
+];
+---
+
+<Site title="Work" description="Case studies: LLM agents and GenAI platforms in production, and applied ML research.">
+  <section class="page-head">
+    <div class="wrap head-grid">
+      <div>
+        <p class="kicker">Quest log</p>
+        <h1>Work</h1>
+        <p class="intro">
+          Each case study tells the same story: what the problem was, what I actually did, what changed, and what I would
+          do differently. Internal work is described at a high level, without confidential details.
+        </p>
+      </div>
+      <div class="art wake" aria-hidden="true">
+        <Sprite sheet="mageActions" frame={24} frames={6} fps={6} loops={6} />
+      </div>
+    </div>
+  </section>
+
+  {
+    groups.map((g) => (
+      <section class="section">
+        <div class="wrap">
+          <header class="section-head">
+            <div>
+              <h2>{g.title}</h2>
+              <p>{g.blurb}</p>
+            </div>
+          </header>
+          <ul class="grid" role="list">
+            {g.items.map((p) => (
+              <li>
+                <ProjectCard project={p} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+</Site>
+
+<style>
+  .page-head {
+    padding-block: clamp(2.5rem, 6vw, 4rem) 0;
+  }
+  .head-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2rem;
+  }
+  h1 {
+    font-size: var(--step-4);
+    margin: 0.5rem 0 1rem;
+  }
+  .intro {
+    color: var(--text-2);
+    max-width: 60ch;
+  }
+  .art {
+    --px: 2;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .grid > li {
+    display: flex;
+  }
+  @media (max-width: 800px) {
+    .grid,
+    .head-grid {
+      grid-template-columns: 1fr;
+    }
+    .art {
+      display: none;
+    }
+  }
+</style>

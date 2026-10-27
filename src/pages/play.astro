@@ -1,0 +1,256 @@
+---
+// The Arcane Archive: an optional, tiny walk-around version of the portfolio.
+// Every building leads to a real page; everything here is also reachable
+// from the regular site.
+import '@fontsource-variable/ibm-plex-sans';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/site.css';
+import '../styles/play.css';
+import PixelIcon from '../components/PixelIcon.astro';
+import Seal from '../components/Seal.astro';
+import { site } from '../data/site';
+
+const petActions = [
+  { id: 'pet', label: 'Pet', key: '1', icon: 'heart' },
+  { id: 'treat', label: 'Treat', key: '2', icon: 'berry' },
+  { id: 'fetch', label: 'Fetch', key: '3', icon: 'orb' },
+  { id: 'fire', label: 'Light', key: '4', icon: 'flame' },
+  { id: 'nap', label: 'Nap', key: '5', icon: 'zz' },
+] as const;
+const heroActions = [
+  { id: 'code', label: 'Code', key: '6', icon: 'laptop' },
+  { id: 'read', label: 'Read', key: '7', icon: 'book' },
+  { id: 'coffee', label: 'Coffee', key: '8', icon: 'cup' },
+  { id: 'cast', label: 'Cast', key: '9', icon: 'sparkle' },
+  { id: 'cheer', label: 'Cheer', key: '0', icon: 'star' },
+  { id: 'think', label: 'Debug', key: '-', icon: 'bug' },
+] as const;
+const places = [
+  { id: 'projects', name: 'Quest Board', page: 'Work', icon: 'quest' },
+  { id: 'research', name: 'The Archive', page: 'Research', icon: 'book' },
+  { id: 'experience', name: 'Chronicle Stone', page: 'Experience', icon: 'scroll' },
+  { id: 'about', name: 'The Study', page: 'About', icon: 'seal' },
+  { id: 'contact', name: 'Raven Post', page: 'Contact', icon: 'letter' },
+] as const;
+---
+
+<!doctype html>
+<html lang="en" class="play">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Play the Archive · {site.name}</title>
+    <meta name="description" content="A tiny walk-around pixel-art version of Victoria Flores Mello's portfolio. Every building opens a real page." />
+    <meta name="theme-color" content="#0b1020" />
+  </head>
+  <body>
+    <a class="skip" href="/">Skip the game and go to the site</a>
+
+    <canvas id="world" tabindex="0" aria-label="A pixel-art night village. Use the arrow keys or WASD to walk, E to enter a building, or use the places menu."
+    ></canvas>
+
+    <header class="topbar">
+      <a class="btn back" href="/">← Back to the site</a>
+      <div class="title">
+        <Seal size={26} />
+        <span>
+          <span class="kicker">The Arcane Archive</span>
+          <span class="sub">Walk around. Each building opens a page.</span>
+        </span>
+      </div>
+      <div class="tools">
+        <button class="btn" type="button" popovertarget="places-menu">Places</button>
+        <button class="btn" type="button" id="calm" aria-pressed="false">Calm mode</button>
+        <button class="btn" type="button" popovertarget="help" aria-label="Controls">?</button>
+      </div>
+    </header>
+
+    <div id="places-menu" class="pop" popover>
+      <p class="pop-title">Walk to…</p>
+      <ul role="list">
+        {
+          places.map((p) => (
+            <li>
+              <button type="button" data-goto={p.id}>
+                <PixelIcon name={p.icon} size={2} />
+                <span>
+                  <strong>{p.page}</strong>
+                  <span class="muted">{p.name}</span>
+                </span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div id="help" class="pop" popover>
+      <p class="pop-title">Controls</p>
+      <dl class="keys">
+        <div><dt>Move</dt><dd><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows, or click / tap the ground</dd></div>
+        <div><dt>Enter</dt><dd><kbd>E</kbd> near a door, or click a building</dd></div>
+        <div><dt>Dragon</dt><dd><kbd>1</kbd>–<kbd>5</kbd>, or click the dragon to pet it</dd></div>
+        <div><dt>You</dt><dd><kbd>6</kbd>–<kbd>0</kbd> and <kbd>-</kbd></dd></div>
+        <div><dt>Aim</dt><dd>Treats and fetch go where your cursor is</dd></div>
+      </dl>
+    </div>
+
+    <div class="prompt" id="prompt" hidden>
+      <kbd>E</kbd>
+      <span>Enter <strong id="prompt-name"></strong> <span class="muted" id="prompt-page"></span></span>
+      <button class="btn btn--primary" type="button" id="prompt-go">Open</button>
+    </div>
+
+    <nav class="toolbar" aria-label="Actions">
+      <div class="group" role="group" aria-label="Dragon">
+        <span class="group-label">Dragon</span>
+        {
+          petActions.map((a) => (
+            <button type="button" class="slot" data-pet={a.id} aria-keyshortcuts={a.key}>
+              <PixelIcon name={a.icon} size={3} />
+              <span class="slot-label">{a.label}</span>
+              <span class="slot-key" aria-hidden="true">
+                {a.key}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+      <div class="group" role="group" aria-label="You">
+        <span class="group-label">You</span>
+        {
+          heroActions.map((a) => (
+            <button type="button" class="slot" data-hero={a.id} aria-keyshortcuts={a.key}>
+              <PixelIcon name={a.icon} size={3} />
+              <span class="slot-label">{a.label}</span>
+              <span class="slot-key" aria-hidden="true">
+                {a.key}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </nav>
+
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+
+    <section class="intro" id="intro" hidden aria-labelledby="intro-title">
+      <div class="intro-card">
+        <p class="kicker">Welcome, traveler</p>
+        <h1 id="intro-title">The Arcane Archive</h1>
+        <p>
+          A tiny night-time village built from this portfolio. Walk around, visit the buildings to open my work, research
+          and story, and say hi to the dragon.
+        </p>
+        <ul class="intro-keys" role="list">
+          <li><kbd>WASD</kbd> / arrows or click to walk</li>
+          <li><kbd>E</kbd> to enter a building</li>
+          <li><kbd>1</kbd>–<kbd>5</kbd> to play with the dragon</li>
+        </ul>
+        <div class="intro-actions">
+          <button class="btn btn--primary" type="button" id="intro-start">Start exploring</button>
+          <a class="btn" href="/">Go to the regular site</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="fade" id="fade" aria-hidden="true"></div>
+    <noscript><p class="noscript">This little world needs JavaScript. <a href="/">Go to the regular site</a>.</p></noscript>
+
+    <script>
+      import { startArchive, type HeroAction, type PetAction } from '../game/top/game';
+
+      const canvas = document.getElementById('world') as HTMLCanvasElement;
+      const prompt = document.getElementById('prompt')!;
+      const toast = document.getElementById('toast')!;
+      const fade = document.getElementById('fade')!;
+      let toastTimer: number | undefined;
+      const say = (msg: string) => {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2800);
+      };
+      let current: { href: string } | null = null;
+      const go = (href: string) => {
+        sessionStorage.setItem('archive:return', '1');
+        fade.classList.add('on');
+        setTimeout(() => (location.href = href), 260);
+      };
+      sessionStorage.removeItem('archive:return');
+
+      const game = await startArchive(canvas, {
+        onPrompt(place) {
+          current = place;
+          prompt.hidden = !place;
+          if (place) {
+            document.getElementById('prompt-name')!.textContent = place.name;
+            document.getElementById('prompt-page')!.textContent = `· ${place.page}`;
+          }
+        },
+        onEnter(place) {
+          go(place.href);
+        },
+        announce: say,
+      });
+      document.getElementById('prompt-go')!.addEventListener('click', () => current && go(current.href));
+
+      document.querySelectorAll<HTMLElement>('[data-pet]').forEach((b) => b.addEventListener('click', () => game.petAction(b.dataset.pet as PetAction)));
+      document.querySelectorAll<HTMLElement>('[data-hero]').forEach((b) => b.addEventListener('click', () => game.heroAction(b.dataset.hero as HeroAction)));
+      document.querySelectorAll<HTMLElement>('[data-goto]').forEach((b) =>
+        b.addEventListener('click', () => {
+          document.getElementById('places-menu')!.hidePopover();
+          game.goTo(b.dataset.goto as never);
+        }),
+      );
+      const keyMap: Record<string, () => void> = {
+        '1': () => game.petAction('pet'),
+        '2': () => game.petAction('treat'),
+        '3': () => game.petAction('fetch'),
+        '4': () => game.petAction('fire'),
+        '5': () => game.petAction('nap'),
+        '6': () => game.heroAction('code'),
+        '7': () => game.heroAction('read'),
+        '8': () => game.heroAction('coffee'),
+        '9': () => game.heroAction('cast'),
+        '0': () => game.heroAction('cheer'),
+        '-': () => game.heroAction('think'),
+      };
+      addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const fn = keyMap[e.key];
+        if (fn && !(e.target as HTMLElement).closest('input,textarea')) fn();
+      });
+
+      const calmBtn = document.getElementById('calm')!;
+      const syncCalm = () => calmBtn.setAttribute('aria-pressed', String(game.calm));
+      syncCalm();
+      calmBtn.addEventListener('click', () => {
+        game.setCalm(!game.calm);
+        syncCalm();
+        say(game.calm ? 'Calm mode on: less motion and no particles.' : 'Calm mode off.');
+      });
+
+      const intro = document.getElementById('intro')!;
+      let seen = false;
+      try {
+        seen = localStorage.getItem('archive:intro') === '1';
+      } catch {}
+      if (new URLSearchParams(location.search).get('intro') === '0') seen = true;
+      if (!seen) {
+        intro.hidden = false;
+        document.getElementById('intro-start')!.focus();
+      } else canvas.focus();
+      document.getElementById('intro-start')!.addEventListener('click', () => {
+        intro.hidden = true;
+        try {
+          localStorage.setItem('archive:intro', '1');
+        } catch {}
+        canvas.focus();
+      });
+    </script>
+  </body>
+</html>

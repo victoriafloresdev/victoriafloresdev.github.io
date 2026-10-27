@@ -1,0 +1,195 @@
+---
+import Site from '../layouts/Site.astro';
+import Sprite from '../components/Sprite.astro';
+import { publications } from '../data/publications';
+import { site } from '../data/site';
+
+const bold = (s: string) => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+const years = [...new Set(publications.map((p) => p.year))].sort((a, b) => b - a);
+---
+
+<Site title="Research" description="Six peer-reviewed papers on language models, tabular deep learning and clinical ML, explained in plain language.">
+  <section class="page-head">
+    <div class="wrap head-grid">
+      <div>
+        <p class="kicker">The archive</p>
+        <h1>Research</h1>
+        <p class="intro">
+          I do applied ML research at <strong>UFMG's SPEED Lab</strong>, advised by Prof. Wagner Meira Jr. and Prof. Gisele
+          Pappa. My work so far covers language models, deep learning for incomplete tabular data and clinical ML. Below,
+          each paper comes with a plain-language summary, why it matters, and what I did.
+        </p>
+        <p class="links">
+          <a class="link-arrow" href={site.links.scholar}>Google Scholar</a>
+        </p>
+      </div>
+      <div class="art wake" aria-hidden="true">
+        <Sprite sheet="mageActions" frame={12} frames={6} fps={4} loops={5} />
+      </div>
+    </div>
+  </section>
+
+  {
+    years.map((y) => (
+      <section class="section year-block" aria-labelledby={`y${y}`}>
+        <div class="wrap year-grid">
+          <h2 id={`y${y}`} class="year">
+            {y}
+          </h2>
+          <ol class="pubs" role="list">
+            {publications
+              .filter((p) => p.year === y)
+              .map((p) => (
+                <li class="pub">
+                  <p class="tags">
+                    <span class="tag tag--gold">{p.venue}</span>
+                    {p.tags.includes('First author') && <span class="tag tag--red">First author</span>}
+                  </p>
+                  <h3>{p.title}</h3>
+                  <p class="authors" set:html={bold(p.authors)} />
+                  <p class="venue">{p.venueNote}</p>
+                  <dl class="explain">
+                    <div>
+                      <dt>In short</dt>
+                      <dd>{p.summary}</dd>
+                    </div>
+                    <div>
+                      <dt>Why it matters</dt>
+                      <dd>{p.why}</dd>
+                    </div>
+                    <div>
+                      <dt>My role</dt>
+                      <dd>{p.role}</dd>
+                    </div>
+                  </dl>
+                  <p class="actions">
+                    {p.links.map((l) => (
+                      <a class="btn" href={l.href}>
+                        {l.label}
+                      </a>
+                    ))}
+                    {p.caseStudy && (
+                      <a class="link-arrow" href={p.caseStudy}>
+                        Case study
+                      </a>
+                    )}
+                  </p>
+                </li>
+              ))}
+          </ol>
+        </div>
+      </section>
+    ))
+  }
+</Site>
+
+<style>
+  .page-head {
+    padding-block: clamp(2.5rem, 6vw, 4rem) 0;
+  }
+  .head-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2rem;
+    padding-bottom: clamp(2rem, 5vw, 3rem);
+  }
+  h1 {
+    font-size: var(--step-4);
+    margin: 0.5rem 0 1rem;
+  }
+  .intro {
+    color: var(--text-2);
+    max-width: 62ch;
+  }
+  .links {
+    margin-top: 1rem;
+  }
+  .art {
+    --px: 2;
+  }
+  .year-grid {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .year {
+    font-family: var(--pixel);
+    font-weight: 400;
+    font-size: 2rem;
+    color: var(--gold);
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    align-self: start;
+  }
+  .pubs {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .pub {
+    max-width: 78ch;
+  }
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .pub h3 {
+    font-size: var(--step-2);
+    line-height: 1.25;
+  }
+  .authors {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    color: var(--text-3);
+  }
+  .authors :global(strong) {
+    color: var(--text);
+  }
+  .venue {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-3);
+    margin-top: 0.2rem;
+  }
+  .explain {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .explain dt {
+    font-family: var(--pixel);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .explain dd {
+    color: var(--text-2);
+    margin-top: 0.2rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.1rem;
+  }
+  @media (max-width: 800px) {
+    .year-grid,
+    .head-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .year {
+      position: static;
+    }
+    .art {
+      display: none;
+    }
+  }
+</style>

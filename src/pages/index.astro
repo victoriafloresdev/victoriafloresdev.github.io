@@ -1,0 +1,417 @@
+---
+import { getCollection } from 'astro:content';
+import Site from '../layouts/Site.astro';
+import Sprite from '../components/Sprite.astro';
+import ProjectCard from '../components/site/ProjectCard.astro';
+import { site, highlights } from '../data/site';
+import { publications } from '../data/publications';
+import { chapters } from '../data/story';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.filter((p) => p.data.featured);
+const recent = publications.slice(0, 3);
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.title,
+  description: site.description,
+  address: { '@type': 'PostalAddress', addressLocality: 'Belo Horizonte', addressCountry: 'BR' },
+  sameAs: [site.links.github, site.links.linkedin, site.links.scholar],
+};
+---
+
+<Site jsonLd={person}>
+  <!-- ═══ hero ═══ -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="kicker">{site.title}</p>
+        <h1>Victoria Flores Mello</h1>
+        <p class="lead">I build the platforms and evaluations that take ML and LLM systems from research to production.</p>
+        <p class="sub">
+          Today I build LLM agents on the team behind <strong>iFood</strong>'s ML platform. Before that, I worked on{' '}
+          <strong>Localiza</strong>'s GenAI platform. In research, I've co-authored <strong>six peer-reviewed papers</strong>,{' '}
+          including one at AAAI ICWSM 2026.
+        </p>
+        <div class="cta">
+          <a class="btn btn--primary" href="/work">View my work</a>
+          <a class="btn" href="/research">Research</a>
+          <a class="link-arrow" href="/about">My story</a>
+        </div>
+        <p class="meta where">
+          <span>Belo Horizonte, Brazil</span> · <span>UTC−3</span> · <span>EN / PT / IT</span>
+        </p>
+      </div>
+
+      <a class="vignette wake" href="/play" aria-label="Play the archive: a small pixel-art world you can walk around">
+        <span class="scene" aria-hidden="true">
+          <img src="/sprites/scene-campfire.png" alt="" width="320" height="200" class="pixelated" />
+          <Sprite sheet="mageMoveS" frame={18} frames={6} fps={5} loops={8} class="mage" />
+          <Sprite sheet="dragonAnimS" frame={0} frames={10} fps={5} loops={5} class="pet" />
+        </span>
+        <span class="vignette-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="vignette-title">the-arcane-archive</span>
+          <span class="vignette-play"><span class="play-tri" aria-hidden="true"></span> Play</span>
+        </span>
+      </a>
+    </div>
+    <div class="wrap">
+      <ul class="stats" role="list">
+        {
+          highlights.map((h) => (
+            <li class="stat">
+              <span class="stat-value">
+                {h.approx ? '≈' : ''}
+                {h.value}
+                {h.estimate && <span class="est-mark" title="Estimated">est.</span>}
+              </span>
+              <span class="stat-label">{h.caption}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ selected work ═══ -->
+  <section class="section">
+    <div class="wrap">
+      <header class="section-head">
+        <div>
+          <p class="kicker">Quest log · Selected work</p>
+          <h2>Things I've built and studied</h2>
+          <p>Two systems running in production and two research projects, each with the problem, what I did, and what changed.</p>
+        </div>
+        <a class="link-arrow" href="/work">All {projects.length} projects</a>
+      </header>
+      <ul class="grid-2" role="list">
+        {
+          featured.map((p) => (
+            <li>
+              <ProjectCard project={p} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ research ═══ -->
+  <section class="section">
+    <div class="wrap research-grid">
+      <header>
+        <p class="kicker">The archive · Research</p>
+        <h2>Recent papers</h2>
+        <p>
+          Applied ML research at UFMG's SPEED Lab: language models, tabular deep learning and clinical ML, written up so
+          that people outside the field can follow.
+        </p>
+        <a class="link-arrow" href="/research">All six publications</a>
+      </header>
+      <ol class="pubs" role="list">
+        {
+          recent.map((p) => (
+            <li class="pub">
+              <p class="pub-venue">
+                <span class="tag tag--gold">{p.venue}</span>
+                {p.tags.includes('First author') && <span class="tag tag--red">First author</span>}
+              </p>
+              <h3>
+                <a href={p.links[0].href}>{p.title}</a>
+              </h3>
+              <p>{p.summary}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═══ trajectory ═══ -->
+  <section class="section">
+    <div class="wrap">
+      <header class="section-head">
+        <div>
+          <p class="kicker">Chronicle · Trajectory</p>
+          <h2>From history to machine learning</h2>
+          <p>A non-linear path: the humanities taught me to question sources; research and production taught me to measure.</p>
+        </div>
+        <a class="link-arrow" href="/about">Read the full story</a>
+      </header>
+      <ol class="chapters" role="list">
+        {
+          chapters.map((c) => (
+            <li class:list={['chapter', `chapter--${c.era}`]}>
+              <span class="chapter-n">{c.n}</span>
+              <span class="meta">{c.period}</span>
+              <h3>{c.title}</h3>
+              <p>{c.place}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</Site>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4rem);
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 48px 48px;
+    mask-image: linear-gradient(#000 70%, transparent);
+    -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  .hero h1 {
+    font-size: var(--step-5);
+    margin: 0.6rem 0 1rem;
+  }
+  .lead {
+    font-size: clamp(1.3rem, 1rem + 1.1vw, 1.7rem);
+    line-height: 1.35;
+    color: var(--text);
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+  .sub {
+    margin-top: 1rem;
+    color: var(--text-2);
+    max-width: 56ch;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.75rem;
+  }
+  .where {
+    margin-top: 1.5rem;
+  }
+  .where span {
+    white-space: nowrap;
+  }
+
+  /* the little window onto the game */
+  .vignette {
+    --px: 2;
+    display: block;
+    text-decoration: none;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #04070e;
+    box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--line);
+    transition:
+      border-color 180ms,
+      transform 180ms var(--ease-out);
+  }
+  .vignette:hover {
+    border-color: var(--gold);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .vignette:hover {
+      transform: translateY(-3px);
+    }
+  }
+  .scene {
+    position: relative;
+    display: block;
+    width: calc(320px * var(--px));
+    height: calc(200px * var(--px));
+  }
+  .scene img {
+    width: 100%;
+    height: 100%;
+  }
+  .scene :global(.mage) {
+    position: absolute;
+    left: calc((124px - 22px) * var(--px));
+    top: calc((174px - 58px) * var(--px));
+  }
+  .scene :global(.pet) {
+    position: absolute;
+    left: calc(198px * var(--px));
+    top: calc((174px - 45px) * var(--px));
+  }
+  .vignette-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.8rem;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-3);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 5px;
+  }
+  .dots i {
+    width: 8px;
+    height: 8px;
+    background: var(--line-2);
+  }
+  .dots i:first-child {
+    background: var(--cinnabar-2);
+  }
+  .vignette-play {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--pixel);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+  }
+  @media (max-width: 1100px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .vignette {
+      justify-self: start;
+    }
+  }
+  @media (max-width: 700px) {
+    .vignette {
+      --px: 1;
+    }
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .grid-2 > li {
+    display: flex;
+  }
+  @media (max-width: 800px) {
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .research-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  .research-grid header h2 {
+    font-size: var(--step-3);
+    margin: 0.4rem 0 0.75rem;
+  }
+  .research-grid header p:not(.kicker) {
+    color: var(--text-2);
+    margin-bottom: 1.25rem;
+  }
+  .pubs {
+    display: grid;
+    gap: 0;
+  }
+  .pub {
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .pub:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .pub-venue {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .pub h3 {
+    font-size: var(--step-1);
+    margin-bottom: 0.4rem;
+  }
+  .pub h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .pub h3 a:hover {
+    color: var(--jade);
+  }
+  .pub p:last-child {
+    color: var(--text-2);
+  }
+  @media (max-width: 900px) {
+    .research-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* the trajectory, from manuscript to terminal */
+  .chapters {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .chapter {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .chapter-n {
+    font-family: var(--pixel);
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .chapter h3 {
+    font-size: 1.05rem;
+  }
+  .chapter p {
+    font-size: 0.9rem;
+    color: var(--text-2);
+  }
+  .chapter--manuscript {
+    background: var(--parchment);
+    border-color: var(--parchment);
+    color: var(--ink);
+  }
+  .chapter--manuscript h3 {
+    font-style: italic;
+  }
+  .chapter--manuscript p,
+  .chapter--manuscript .meta {
+    color: #5e4f39;
+  }
+  .chapter--manuscript .chapter-n {
+    color: var(--cinnabar-2);
+  }
+  .chapter--digital {
+    background:
+      linear-gradient(rgb(127 209 181 / 0.05) 1px, transparent 1px) 0 0 / 100% 6px,
+      var(--surface);
+  }
+  .chapter--digital h3 {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 0.98rem;
+  }
+  @media (max-width: 1000px) {
+    .chapters {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+</style>

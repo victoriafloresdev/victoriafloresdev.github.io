@@ -1,0 +1,43 @@
+---
+// A pixel-art sprite from one of the processed strips in /public/sprites.
+// Animates with CSS steps(); plays a few loops then rests on its first frame
+// (WCAG 2.2.2), and wakes up again on hover. Scale comes from --px on an
+// ancestor (integer values keep pixels crisp).
+import meta from '../../public/sprites/sprites.json';
+
+type SheetName = keyof typeof meta;
+interface Props {
+  sheet: SheetName;
+  frame?: number; // first frame
+  frames?: number; // how many frames to play (1 = still)
+  fps?: number;
+  loops?: number | 'infinite';
+  alt?: string; // omit for decorative sprites
+  flip?: boolean;
+  class?: string;
+  style?: string;
+}
+const { sheet, frame = 0, frames = 1, fps = 6, loops = 6, alt, flip = false, class: cls, style = '' } = Astro.props;
+const m = meta[sheet] as { src: string; frameW?: number; frameH?: number; frames?: number; w?: number; h?: number };
+const fw = m.frameW ?? m.w!;
+const fh = m.frameH ?? m.h!;
+const total = m.frames ?? 1;
+const vars = [
+  `--src:url(${m.src})`,
+  `--fw:${fw}`,
+  `--fh:${fh}`,
+  `--frames:${total}`,
+  `--from:${frame}`,
+  `--n:${frames}`,
+  `--fps:${fps}`,
+  `--loops:${loops}`,
+].join(';');
+---
+
+<span
+  class:list={['sprite', { 'sprite--flip': flip }, cls]}
+  style={`${vars};${style}`}
+  data-anim={frames > 1 ? '' : undefined}
+  role={alt ? 'img' : undefined}
+  aria-label={alt}
+  aria-hidden={alt ? undefined : 'true'}></span>

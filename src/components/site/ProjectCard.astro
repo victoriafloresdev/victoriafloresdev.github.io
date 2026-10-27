@@ -1,0 +1,86 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  compact?: boolean;
+}
+const { project, compact = false } = Astro.props;
+const p = project.data;
+const top = p.metrics[0];
+---
+
+<article class:list={['card', 'project', { compact }]}>
+  <p class="top">
+    <span class:list={['tag', p.kind === 'production' ? 'tag--jade' : p.label.startsWith('First') ? 'tag--red' : 'tag--gold']}>{p.label}</span>
+    <span class="meta">{p.org.split(',')[0]} · {p.period}</span>
+  </p>
+  <h3 style={`view-transition-name: title-${project.id}`}>
+    <a class="stretch" href={`/work/${project.id}`}>{p.title}</a>
+  </h3>
+  <p class="summary">{p.summary}</p>
+  {
+    top && !compact && (
+      <p class="metric">
+        <span class="metric-value">
+          {top.value}
+          {top.estimate && <span class="est-mark">est.</span>}
+        </span>
+        <span class="metric-label">{top.label}</span>
+      </p>
+    )
+  }
+  <p class="more" aria-hidden="true">Read case study →</p>
+</article>
+
+<style>
+  .project {
+    width: 100%;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  h3 {
+    font-size: var(--step-1);
+    line-height: 1.25;
+  }
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .summary {
+    color: var(--text-2);
+    font-size: 1rem;
+  }
+  .metric {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--line-2);
+  }
+  .metric-value {
+    font-family: var(--pixel);
+    font-size: 1.35rem;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .metric-label {
+    font-size: 0.9rem;
+    color: var(--text-2);
+    line-height: 1.35;
+  }
+  .more {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: var(--jade);
+  }
+  .compact .more {
+    margin-top: auto;
+  }
+</style>

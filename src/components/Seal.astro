@@ -1,0 +1,47 @@
+---
+// A carved name seal (印章) in cinnabar, with the initials stacked vertically
+// the way name seals read top to bottom. Pure SVG, no image asset.
+interface Props {
+  size?: number; // rendered height in px
+  class?: string;
+}
+const { size = 48, class: className } = Astro.props;
+const letters = ['V', 'F', 'M'];
+---
+
+<svg
+  class:list={['seal', className]}
+  viewBox="0 0 30 48"
+  height={size}
+  width={(size * 30) / 48}
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+>
+  <!-- slightly chipped outline, like a hand-carved stone -->
+  <path
+    d="M2 0H27V1H28V2H30V20H29V22H30V46H28V47H26V48H3V47H1V45H0V30H1V28H0V2H1V1H2Z"
+    fill="#b84a3a"></path>
+  <rect x="3" y="3" width="24" height="42" fill="none" stroke="#ede3cc" stroke-width="1.5"></rect>
+  {
+    letters.map((l, i) => (
+      <text
+        x="15"
+        y={17 + i * 12}
+        text-anchor="middle"
+        fill="#ede3cc"
+        font-family="'Pixelify Sans Variable', monospace"
+        font-size="12"
+        font-weight="600"
+      >
+        {l}
+      </text>
+    ))
+  }
+</svg>
+
+<style>
+  .seal {
+    display: inline-block;
+    flex: none;
+  }
+</style>

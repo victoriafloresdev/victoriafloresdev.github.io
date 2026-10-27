@@ -1,0 +1,20 @@
+---
+// Renders one of the shared pixel icons as a crisp inline SVG.
+import { ICONS, type IconName } from '../game/icons';
+
+interface Props {
+  name: IconName;
+  size?: number; // css px per art pixel
+}
+const { name, size = 3 } = Astro.props;
+const { rows, pal } = ICONS[name];
+const w = rows[0].length;
+const h = rows.length;
+const cells = rows.flatMap((row, y) =>
+  [...row].map((ch, x) => ({ x, y, fill: (pal as Record<string, string>)[ch] })).filter((c) => c.fill),
+);
+---
+
+<svg class="pixel-icon" viewBox={`0 0 ${w} ${h}`} width={w * size} height={h * size} shape-rendering="crispEdges" aria-hidden="true">
+  {cells.map((c) => <rect x={c.x} y={c.y} width="1" height="1" fill={c.fill} />)}
+</svg>

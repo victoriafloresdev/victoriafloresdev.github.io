@@ -1,0 +1,321 @@
+---
+import Site from '../layouts/Site.astro';
+import Sprite from '../components/Sprite.astro';
+import { site, languages } from '../data/site';
+import { intro, chapters, talks, awards, sheet } from '../data/story';
+
+const profile = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: site.name,
+    jobTitle: site.title,
+    description: site.description,
+    knowsLanguage: ['pt', 'en', 'it', 'es', 'fr'],
+    alumniOf: { '@type': 'CollegeOrUniversity', name: 'Universidade Federal de Minas Gerais' },
+    sameAs: [site.links.github, site.links.linkedin, site.links.scholar],
+  },
+};
+---
+
+<Site title="About" description="The story so far: from history to machine learning, research to production." jsonLd={profile}>
+  <section class="page-head">
+    <div class="wrap head-grid">
+      <div>
+        <p class="kicker">Character sheet</p>
+        <h1>About me</h1>
+        {intro.map((p, i) => <p class:list={['intro', { first: i === 0 }]}>{p}</p>)}
+      </div>
+      <aside class="sheet wake" aria-label="Character sheet">
+        <div class="portrait" aria-hidden="true">
+          <Sprite sheet="mageActions" frame={0} frames={6} fps={4} loops={4} />
+          <Sprite sheet="dragonAnimS" frame={30} frames={5} fps={6} loops={4} class="pet" />
+        </div>
+        <dl>
+          {
+            sheet.map((r) => (
+              <div class="row">
+                <dt>{r.k}</dt>
+                <dd>{r.v}</dd>
+              </div>
+            ))
+          }
+          <div class="row">
+            <dt>Languages</dt>
+            <dd>{languages.join(' · ')}</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="chronicle">
+    <div class="wrap">
+      <header class="section-head">
+        <div>
+          <p class="kicker">Chronicle</p>
+          <h2>The story so far</h2>
+        </div>
+      </header>
+      <ol class="timeline" role="list">
+        {
+          chapters.map((c) => (
+            <li class:list={['ch', `ch--${c.era}`]}>
+              <div class="ch-marker" aria-hidden="true">
+                {c.n}
+              </div>
+              <div class="ch-card">
+                <p class="meta">{c.period}</p>
+                <h3>{c.title}</h3>
+                <p class="place">
+                  {c.place}
+                  {c.placeNote && <span> · {c.placeNote}</span>}
+                </p>
+                {c.body.map((b) => (
+                  <p>{b}</p>
+                ))}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div>
+        <p class="kicker">Guild hall</p>
+        <h2>Talks &amp; community</h2>
+        <ul class="list" role="list">
+          {
+            talks.map((t) => (
+              <li>
+                <strong>{t.what}</strong>
+                <span>{t.where}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <p class="kicker">Achievements</p>
+        <h2>Awards &amp; honors</h2>
+        <ul class="list achievements" role="list">
+          {
+            awards.map((a) => (
+              <li>
+                <strong>★ {a.title}</strong>
+                <span>{a.where}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="outside">
+          Outside work I speak at and volunteer for women-in-tech and developer communities in Belo Horizonte, and I drew
+          the official T-shirt for DevFest BH 2025. The pixel-art characters on this site are mine too.
+        </p>
+      </div>
+    </div>
+  </section>
+</Site>
+
+<style>
+  .page-head {
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3rem);
+  }
+  .head-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  h1 {
+    font-size: var(--step-4);
+    margin: 0.5rem 0 1.25rem;
+  }
+  .intro {
+    color: var(--text-2);
+    max-width: 62ch;
+  }
+  .intro + .intro {
+    margin-top: 1rem;
+  }
+  .intro.first {
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .sheet {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .portrait {
+    --px: 2;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    gap: 0;
+    padding: 1.25rem 1rem 0.75rem;
+    background:
+      radial-gradient(circle at 50% 80%, rgb(242 184 90 / 0.18), transparent 60%),
+      linear-gradient(#0d1730, #121b33);
+    border-bottom: 1px solid var(--line);
+  }
+  .portrait :global(.pet) {
+    margin-left: -10px;
+  }
+  .sheet dl {
+    padding: 0.5rem 1.1rem 1rem;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-top: 1px dashed var(--line);
+    font-size: 0.92rem;
+  }
+  .row:first-child {
+    border-top: 0;
+  }
+  .row dt {
+    font-family: var(--pixel);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-top: 0.15rem;
+  }
+  .row dd {
+    color: var(--text-2);
+  }
+
+  /* timeline: manuscript → terminal */
+  .timeline {
+    display: grid;
+    gap: 1rem;
+    max-width: 860px;
+  }
+  .ch {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 1rem;
+    position: relative;
+  }
+  .ch:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 52px;
+    bottom: -1rem;
+    width: 2px;
+    background: repeating-linear-gradient(var(--line-2) 0 6px, transparent 6px 10px);
+  }
+  .ch-marker {
+    width: 56px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    font-family: var(--pixel);
+    font-size: 1.2rem;
+    color: var(--gold);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .ch-card {
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .ch-card h3 {
+    font-size: var(--step-1);
+    margin: 0.2rem 0 0.3rem;
+  }
+  .place {
+    font-size: 0.95rem;
+    color: var(--jade);
+  }
+  .place span {
+    color: var(--text-3);
+  }
+  .ch-card p:not(.meta):not(.place) {
+    color: var(--text-2);
+    margin-top: 0.7rem;
+  }
+  .ch--manuscript .ch-card {
+    background: var(--parchment);
+    border-color: var(--parchment);
+    color: var(--ink);
+  }
+  .ch--manuscript .ch-card h3 {
+    font-style: italic;
+  }
+  .ch--manuscript .ch-card p:not(.meta):not(.place) {
+    color: #4a3d2a;
+  }
+  .ch--manuscript .place {
+    color: #8e3428;
+  }
+  .ch--manuscript .meta {
+    color: #6b5a3e;
+  }
+  .ch--manuscript .ch-marker {
+    background: var(--parchment);
+    color: var(--cinnabar-2);
+  }
+  .ch--digital .ch-card {
+    background:
+      linear-gradient(rgb(127 209 181 / 0.045) 1px, transparent 1px) 0 0 / 100% 6px,
+      var(--surface);
+  }
+  .ch--digital .ch-card h3 {
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  .two-col h2 {
+    font-size: var(--step-2);
+    margin: 0.4rem 0 1.25rem;
+  }
+  .list {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .list li {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .list strong {
+    font-size: 0.98rem;
+  }
+  .list span {
+    color: var(--text-2);
+    font-size: 0.95rem;
+  }
+  .achievements strong {
+    color: var(--gold);
+  }
+  .outside {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--line-2);
+    color: var(--text-2);
+  }
+  @media (max-width: 900px) {
+    .head-grid,
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

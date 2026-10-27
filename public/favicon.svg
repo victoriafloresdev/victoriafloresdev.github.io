@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 48" shape-rendering="crispEdges">
+  <path d="M2 0H27V1H28V2H30V20H29V22H30V46H28V47H26V48H3V47H1V45H0V30H1V28H0V2H1V1H2Z" fill="#b84a3a"/>
+  <rect x="3" y="3" width="24" height="42" fill="none" stroke="#ede3cc" stroke-width="1.5"/>
+  <g fill="#ede3cc" font-family="monospace" font-size="12" font-weight="700" text-anchor="middle">
+    <text x="15" y="17">V</text><text x="15" y="29">F</text><text x="15" y="41">M</text>
+  </g>
+</svg>

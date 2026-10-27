@@ -1,0 +1,122 @@
+---
+import Sprite from '../Sprite.astro';
+import Seal from '../Seal.astro';
+import { site } from '../../data/site';
+const email = site.links.email.replace('mailto:', '');
+---
+
+<footer class="site-footer" id="contact">
+  <div class="wrap contact">
+    <div class="contact-text">
+      <p class="kicker">Raven post · Contact</p>
+      <h2>Say hello</h2>
+      <p>
+        I'm always happy to talk about LLM agents, ML platforms, evaluation, or research collaborations. Email is the
+        fastest way to reach me.
+      </p>
+      <div class="contact-actions">
+        <a class="btn btn--primary" href={site.links.email}>{email}</a>
+        <button class="btn copy" type="button" data-copy={email}>Copy email</button>
+        <span class="copied" role="status" aria-live="polite"></span>
+      </div>
+      <ul class="socials" role="list">
+        <li><a href={site.links.linkedin}>LinkedIn</a></li>
+        <li><a href={site.links.github}>GitHub</a></li>
+        <li><a href={site.links.scholar}>Google Scholar</a></li>
+      </ul>
+    </div>
+    <div class="contact-art wake" aria-hidden="true">
+      <Sprite sheet="dragonAnim" frame={30} frames={5} fps={6} loops={4} class="dragon" />
+    </div>
+  </div>
+  <div class="wrap colophon">
+    <Seal size={28} />
+    <p>
+      {site.name} · Belo Horizonte, Brazil<br />
+      <span>Pixel art characters by Victoria · built with Astro · <a href="/play">play the archive</a></span>
+    </p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const status = btn.parentElement?.querySelector('.copied');
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy!);
+        if (status) status.textContent = 'Copied! The dragon will deliver it.';
+      } catch {
+        if (status) status.textContent = 'Press Ctrl+C to copy.';
+      }
+      setTimeout(() => status && (status.textContent = ''), 3000);
+    });
+  });
+</script>
+
+<style>
+  .site-footer {
+    margin-top: clamp(3rem, 8vw, 5rem);
+    border-top: 1px solid var(--line);
+    background: var(--bg-2);
+  }
+  .contact {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding-block: clamp(3rem, 7vw, 4.5rem);
+  }
+  .contact h2 {
+    font-size: var(--step-3);
+    margin: 0.35rem 0 0.75rem;
+  }
+  .contact-text > p:not(.kicker) {
+    color: var(--text-2);
+    max-width: 56ch;
+  }
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .copied {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--jade);
+  }
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+  }
+  .contact-art {
+    --px: 3;
+  }
+  .colophon {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding-block: 1.5rem 2rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-3);
+  }
+  .colophon p span {
+    color: var(--text-3);
+  }
+  @media (max-width: 720px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+    .contact-art {
+      --px: 2;
+      justify-self: end;
+    }
+  }
+</style>

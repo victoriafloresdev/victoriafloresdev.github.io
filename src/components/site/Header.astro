@@ -1,0 +1,133 @@
+---
+import Seal from '../Seal.astro';
+import { site } from '../../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/work', label: 'Work' },
+  { href: '/research', label: 'Research' },
+  { href: '/about', label: 'About' },
+  { href: '#contact', label: 'Contact' },
+];
+const current = (href: string) => (href !== '#contact' && (path === href || path.startsWith(`${href}/`)) ? 'page' : undefined);
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+      <Seal size={32} />
+      <span class="brand-text">
+        <span class="brand-name">{site.name}</span>
+        <span class="brand-role">{site.title}</span>
+      </span>
+    </a>
+    <nav aria-label="Main">
+      <ul role="list">
+        {
+          nav.map((n) => (
+            <li>
+              <a href={n.href} aria-current={current(n.href)}>
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="btn btn--play" href="/play" aria-current={path === '/play' ? 'page' : undefined}>
+            <span class="play-tri" aria-hidden="true"></span> Play
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    min-height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .brand-text {
+    display: grid;
+    line-height: 1.2;
+  }
+  .brand-name {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .brand-role {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+  nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.25rem, 1.6vw, 1.25rem);
+  }
+  nav a:not(.btn) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  nav a:not(.btn):hover,
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-color: var(--gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.45em;
+  }
+  .btn--play {
+    min-height: 38px;
+    padding: 0.3em 0.85em;
+  }
+  @media (max-width: 720px) {
+    .brand-role {
+      display: none;
+    }
+    .bar {
+      flex-wrap: wrap;
+      padding-block: 0.4rem;
+    }
+    nav {
+      width: 100%;
+    }
+    nav ul {
+      justify-content: space-between;
+      gap: 0.25rem;
+    }
+    nav a:not(.btn) {
+      padding-inline: 0.15rem;
+      font-size: 0.85rem;
+    }
+    .btn--play {
+      padding-inline: 0.65em;
+    }
+  }
+</style>

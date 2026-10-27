@@ -1,0 +1,241 @@
+---
+import { getCollection, render } from 'astro:content';
+import Site from '../../layouts/Site.astro';
+import Sprite from '../../components/Sprite.astro';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return all.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: all[(i + 1) % all.length] },
+  }));
+}
+
+const { project, next } = Astro.props;
+const { Content } = await render(project);
+const p = project.data;
+const tagClass = p.kind === 'production' ? 'tag--jade' : p.label.startsWith('First') ? 'tag--red' : 'tag--gold';
+---
+
+<Site title={p.title} description={p.summary}>
+  <article class="case">
+    <header class="wrap case-head">
+      <a class="back link-arrow" href="/work">All work</a>
+      <p class="badges">
+        <span class:list={['tag', tagClass]}>{p.label}</span>
+        <span class="meta">{p.org} · {p.period}</span>
+      </p>
+      <h1 style={`view-transition-name: title-${project.id}`}>{p.title}</h1>
+      <p class="lead">{p.summary}</p>
+      {
+        p.metrics.length > 0 && (
+          <ul class="stats" role="list" aria-label="Key results">
+            {p.metrics.map((m) => (
+              <li class="stat">
+                <span class="stat-value">
+                  {m.value}
+                  {m.estimate && (
+                    <span class="est-mark" title="Estimated; to be replaced with measured values">
+                      est.
+                    </span>
+                  )}
+                </span>
+                <span class="stat-label">{m.label}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="wrap case-body">
+      <div class="prose">
+        <Content />
+        {p.note && <p class="note">{p.note}</p>}
+      </div>
+
+      <aside class="facts" aria-label="Project facts">
+        <dl>
+          <div>
+            <dt>My role</dt>
+            <dd>{p.role}</dd>
+          </div>
+          <div>
+            <dt>Where</dt>
+            <dd>
+              {p.org}
+              {p.orgNote && <span class="muted"> · {p.orgNote}</span>}
+            </dd>
+          </div>
+          <div>
+            <dt>When</dt>
+            <dd>{p.period}</dd>
+          </div>
+          <div>
+            <dt>Tools</dt>
+            <dd>
+              <ul class="chips" role="list">
+                {p.stack.map((s) => <li class="tag">{s}</li>)}
+              </ul>
+            </dd>
+          </div>
+          {
+            p.links.length > 0 && (
+              <div>
+                <dt>Links</dt>
+                <dd>
+                  <ul class="links" role="list">
+                    {p.links.map((l) => (
+                      <li>
+                        <a class="link-arrow" href={l.href}>
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+      </aside>
+    </div>
+
+    <nav class="wrap next" aria-label="Next case study">
+      <a class="card next-card wake" href={`/work/${next.id}`}>
+        <span class="kicker">Next case study</span>
+        <span class="next-title">{next.data.title}</span>
+        <span class="meta">{next.data.org.split(',')[0]} · {next.data.period}</span>
+        <span class="next-art" aria-hidden="true"><Sprite sheet="mageMoveS" frame={0} frames={6} fps={9} loops={3} /></span>
+      </a>
+    </nav>
+  </article>
+</Site>
+
+<style>
+  .case-head {
+    padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 5vw, 3rem);
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 1.75rem;
+  }
+  .back::after {
+    content: none;
+  }
+  .back::before {
+    content: '← ';
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  h1 {
+    font-size: var(--step-4);
+    margin: 0.9rem 0 1rem;
+    max-width: 24ch;
+  }
+  .lead {
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.35rem);
+    line-height: 1.5;
+    color: var(--text);
+    max-width: 60ch;
+    margin-bottom: 2rem;
+  }
+  .case-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    padding-bottom: clamp(2rem, 6vw, 4rem);
+  }
+  .prose > :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .note {
+    margin-top: 2.5rem !important;
+    padding: 0.9rem 1rem;
+    border: 1px dashed var(--line-2);
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    color: var(--text-3);
+  }
+  .facts {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .facts dl {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .facts dt {
+    font-family: var(--pixel);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+  .facts dd {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+  .muted {
+    color: var(--text-3);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .links {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .next {
+    padding-bottom: 1rem;
+  }
+  .next-card {
+    text-decoration: none;
+    color: var(--text);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'k art' 't art' 'm art';
+    align-items: center;
+  }
+  .next-card .kicker {
+    grid-area: k;
+  }
+  .next-title {
+    grid-area: t;
+    font-size: var(--step-2);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .next-card .meta {
+    grid-area: m;
+  }
+  .next-art {
+    grid-area: art;
+    --px: 2;
+  }
+  @media (max-width: 900px) {
+    .case-body {
+      grid-template-columns: 1fr;
+    }
+    .facts {
+      position: static;
+      order: -1;
+    }
+    .next-art {
+      display: none;
+    }
+  }
+</style>

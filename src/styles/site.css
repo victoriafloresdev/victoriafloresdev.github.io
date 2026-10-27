@@ -1,0 +1,511 @@
+/* ─── The Arcane Archive · main site ──────────────────────────────────────
+   A text-first, fast portfolio with pixel-art accents. Rules of thumb from
+   the research: body 17–18px at 1.65, prose ≤ 68ch, one interactive accent
+   (jade), one highlight (gold), cinnabar as seasoning, motion ≤ 300ms. */
+
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+@layer reset, tokens, base, layout, components, utilities;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd,
+  ul,
+  ol {
+    margin: 0;
+  }
+  ul[role='list'],
+  ol[role='list'] {
+    list-style: none;
+    padding: 0;
+  }
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  button {
+    font: inherit;
+  }
+}
+
+@layer tokens {
+  :root {
+    --bg: #0b1020;
+    --bg-2: #0d1326;
+    --surface: #141b2d;
+    --surface-2: #1a2238;
+    --line: rgb(236 228 207 / 0.1);
+    --line-2: rgb(236 228 207 / 0.18);
+    --text: #ece4cf;
+    --text-2: #bdb6a3;
+    --text-3: #918b7d;
+    --jade: #7fd1b5;
+    --jade-2: #5fbfa0;
+    --gold: #d9ae5b;
+    --cinnabar: #e5533d;
+    --cinnabar-2: #b84a3a;
+    --parchment: #eadfc4;
+    --ink: #2b2418;
+
+    --sans: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+    --pixel: 'Departure Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+    --step--1: 0.875rem;
+    --step-0: 1.0625rem;
+    --step-1: 1.3rem;
+    --step-2: 1.65rem;
+    --step-3: clamp(1.9rem, 1.4rem + 2vw, 2.4rem);
+    --step-4: clamp(2.3rem, 1.6rem + 3.2vw, 3.3rem);
+    --step-5: clamp(2.6rem, 1.6rem + 4.6vw, 4.3rem);
+
+    --wide: 1180px;
+    --prose: 68ch;
+    --gutter: clamp(1.25rem, 4vw, 2.5rem);
+    --header-h: 64px;
+    --radius: 6px;
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    color-scheme: dark;
+  }
+  @media (min-width: 900px) {
+    :root {
+      --step-0: 1.125rem;
+    }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    letter-spacing: 0.003em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    flex: 1;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  p,
+  li {
+    text-wrap: pretty;
+  }
+  a {
+    color: var(--jade);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  a:hover {
+    color: var(--text);
+  }
+  strong {
+    font-weight: 600;
+    color: var(--text);
+  }
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  ::selection {
+    background: rgb(127 209 181 / 0.3);
+  }
+  .pixelated {
+    image-rendering: pixelated;
+  }
+}
+
+@layer layout {
+  .wrap {
+    width: min(100% - 2 * var(--gutter), var(--wide));
+    margin-inline: auto;
+  }
+  .section {
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+  }
+  .section + .section {
+    border-top: 1px solid var(--line);
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  .section-head h2 {
+    font-size: var(--step-3);
+  }
+  .section-head p {
+    color: var(--text-2);
+    max-width: 52ch;
+    margin-top: 0.5rem;
+  }
+}
+
+@layer components {
+  /* small uppercase label in the pixel font */
+  .kicker {
+    font-family: var(--pixel);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.38em 0.6em;
+    border: 1px solid var(--line-2);
+    border-radius: 3px;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+  .tag--jade {
+    color: var(--jade);
+    border-color: rgb(127 209 181 / 0.35);
+  }
+  .tag--gold {
+    color: var(--gold);
+    border-color: rgb(217 174 91 / 0.4);
+  }
+  .tag--red {
+    color: #f08a77;
+    border-color: rgb(229 83 61 / 0.45);
+  }
+
+  /* buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    min-height: 44px;
+    padding: 0.55em 1.05em;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 160ms,
+      border-color 160ms;
+  }
+  .btn:hover {
+    color: var(--text);
+    border-color: var(--jade-2);
+    background: var(--surface-2);
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn--primary {
+    color: #08121a;
+    background: var(--jade);
+    border-color: var(--jade);
+  }
+  .btn--primary:hover {
+    color: #08121a;
+    background: #9fe0c9;
+    border-color: #9fe0c9;
+  }
+  .btn--play {
+    font-family: var(--pixel);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.9rem;
+    color: var(--gold);
+    border-color: rgb(217 174 91 / 0.45);
+    background: rgb(217 174 91 / 0.06);
+  }
+  .btn--play:hover {
+    color: #1a1206;
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .play-tri {
+    width: 0;
+    height: 0;
+    border-block: 5px solid transparent;
+    border-left: 8px solid currentColor;
+  }
+  .link-arrow {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .link-arrow::after {
+    content: '→';
+    display: inline-block;
+    margin-left: 0.45em;
+    transition: transform 160ms var(--ease-out);
+  }
+  .link-arrow:hover::after {
+    transform: translateX(3px);
+  }
+
+  /* pixel-art sprites (CSS steps animation over a horizontal strip) */
+  .sprite {
+    display: block;
+    width: calc(var(--fw) * var(--px, 1) * 1px);
+    height: calc(var(--fh) * var(--px, 1) * 1px);
+    background-image: var(--src);
+    background-repeat: no-repeat;
+    background-size: calc(var(--fw) * var(--frames) * var(--px, 1) * 1px) calc(var(--fh) * var(--px, 1) * 1px);
+    background-position: calc(var(--from) * var(--fw) * var(--px, 1) * -1px) 0;
+    image-rendering: pixelated;
+  }
+  .sprite--flip {
+    transform: scaleX(-1);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sprite[data-anim] {
+      animation: sprite-a calc(var(--n) / var(--fps) * 1s) steps(var(--n)) var(--loops);
+    }
+    /* finite loops satisfy WCAG 2.2.2; hovering wakes the sprite up again */
+    .sprite[data-anim]:hover,
+    :hover > .sprite[data-anim],
+    .wake:hover .sprite[data-anim] {
+      animation: sprite-b calc(var(--n) / var(--fps) * 1s) steps(var(--n)) infinite;
+    }
+  }
+  @keyframes sprite-a {
+    from {
+      background-position-x: calc(var(--from) * var(--fw) * var(--px, 1) * -1px);
+    }
+    to {
+      background-position-x: calc((var(--from) + var(--n)) * var(--fw) * var(--px, 1) * -1px);
+    }
+  }
+  @keyframes sprite-b {
+    from {
+      background-position-x: calc(var(--from) * var(--fw) * var(--px, 1) * -1px);
+    }
+    to {
+      background-position-x: calc((var(--from) + var(--n)) * var(--fw) * var(--px, 1) * -1px);
+    }
+  }
+
+  /* cards with "targeting bracket" corners on hover */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition:
+      border-color 180ms,
+      transform 180ms var(--ease-out),
+      background-color 180ms;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 180ms;
+    --c: var(--gold);
+    background:
+      linear-gradient(var(--c) 0 0) top left / 10px 2px,
+      linear-gradient(var(--c) 0 0) top left / 2px 10px,
+      linear-gradient(var(--c) 0 0) top right / 10px 2px,
+      linear-gradient(var(--c) 0 0) top right / 2px 10px,
+      linear-gradient(var(--c) 0 0) bottom left / 10px 2px,
+      linear-gradient(var(--c) 0 0) bottom left / 2px 10px,
+      linear-gradient(var(--c) 0 0) bottom right / 10px 2px,
+      linear-gradient(var(--c) 0 0) bottom right / 2px 10px;
+    background-repeat: no-repeat;
+  }
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--line-2);
+    background: var(--surface-2);
+  }
+  .card:hover::before,
+  .card:focus-within::before {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .card:hover {
+      transform: translateY(-3px);
+    }
+  }
+  /* the whole card is clickable through its title link */
+  .card .stretch::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .card a:not(.stretch) {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* metric tiles */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .stat {
+    background: var(--bg-2);
+    padding: 1.25rem 1.25rem 1.1rem;
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+  .stat-value {
+    font-family: var(--pixel);
+    font-size: 1.85rem;
+    line-height: 1.1;
+    color: var(--gold);
+    letter-spacing: -0.01em;
+  }
+  .stat-label {
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--text-2);
+  }
+  .est-mark {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text-3);
+    vertical-align: super;
+    margin-left: 0.2em;
+  }
+
+  /* long-form reading */
+  .prose {
+    max-width: var(--prose);
+    color: var(--text-2);
+  }
+  .prose > * + * {
+    margin-top: 1.1em;
+  }
+  .prose h2 {
+    margin-top: 2.2em;
+    font-size: var(--step-2);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .prose h2::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--gold);
+    flex: none;
+    box-shadow: 4px 4px 0 var(--cinnabar-2);
+  }
+  .prose h3 {
+    margin-top: 1.8em;
+    font-size: var(--step-1);
+    color: var(--text);
+  }
+  .prose strong {
+    color: var(--text);
+  }
+  .prose ul,
+  .prose ol {
+    padding-left: 1.2em;
+  }
+  .prose li + li {
+    margin-top: 0.45em;
+  }
+  .prose li::marker {
+    color: var(--gold);
+  }
+  .prose blockquote {
+    border-left: 3px solid var(--gold);
+    padding-left: 1rem;
+    color: var(--text);
+  }
+}
+
+@layer utilities {
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* page transitions: a quick crossfade, only for people who want motion */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+  }
+}

@@ -1,0 +1,57 @@
+---
+import Site from '../layouts/Site.astro';
+import Sprite from '../components/Sprite.astro';
+---
+
+<Site title="Page not found">
+  <section class="wrap lost">
+    <div class="art wake" aria-hidden="true">
+      <Sprite sheet="mageActions" frame={36} frames={6} fps={5} loops={6} />
+    </div>
+    <div>
+      <p class="kicker">404 · Lost in the archive</p>
+      <h1>This page wandered off</h1>
+      <p>Even the dragon couldn't find it. Try one of these instead:</p>
+      <p class="cta">
+        <a class="btn btn--primary" href="/">Home</a>
+        <a class="btn" href="/work">Work</a>
+        <a class="btn" href="/research">Research</a>
+        <a class="btn btn--play" href="/play"><span class="play-tri" aria-hidden="true"></span> Play</a>
+      </p>
+    </div>
+  </section>
+</Site>
+
+<style>
+  .lost {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+    align-items: center;
+    padding-block: clamp(4rem, 12vw, 8rem);
+  }
+  .art {
+    --px: 3;
+  }
+  h1 {
+    font-size: var(--step-4);
+    margin: 0.5rem 0 1rem;
+  }
+  p {
+    color: var(--text-2);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  @media (max-width: 700px) {
+    .lost {
+      grid-template-columns: 1fr;
+    }
+    .art {
+      --px: 2;
+    }
+  }
+</style>
